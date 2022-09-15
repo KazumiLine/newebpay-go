@@ -38,18 +38,18 @@ func AddPKCS7Padding(ciphertext []byte) []byte {
 	return append(ciphertext, padtext...)
 }
 
-func KeyDecrypt(deCodeText, hashKey, hashIV string) string {
+func KeyDecrypt(deCodeText, hashKey, hashIV string) (string, error) {
 	cipherTextDecoded, err := hex.DecodeString(deCodeText)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	block, err := aes.NewCipher([]byte(hashKey))
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	mode := cipher.NewCBCDecrypter(block, []byte(hashIV))
 	mode.CryptBlocks(cipherTextDecoded, cipherTextDecoded)
-	return string(cipherTextDecoded)
+	return string(cipherTextDecoded), nil
 }
 
 func GenerateCheckValue(plaintext, hashKey, hashIV string) string {

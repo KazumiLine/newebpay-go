@@ -2,18 +2,29 @@ package newebpay
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 )
 
+var store = NewStore("StoreID", "Key", "IV", TestApiUrl)
+
 func TestNewTrade(t *testing.T) {
-	store := NewStore("merchaneId", "hashKey", "hashIV", ApiUrl)
-	html, _ := store.NewTradeRequest("hihihi", 100, "哈囉你好").
-		SetBankType(BankType_FCBK).
-		SetClientBackURL("url").
-		SetEmail("email").
-		SetLangType(LangType_TW).
-		UseCVS().
-		UseCreditInst(Installment_24_Month, Installment_30_Month).
-		GenerateHTML()
-	fmt.Println(html)
+	http.HandleFunc("/new", func(w http.ResponseWriter, r *http.Request) {
+		html, _ := store.NewTradeRequest("", 100, "Product Info").
+			SetNotifyURL("callback url").
+			SetEmail("custom@gmail.com").
+			SetOrderComment("Order Comment").
+			UseWebATM().UseVACC().UseBARCODE().UseCVS().
+			GenerateHTML()
+		fmt.Println(html)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write([]byte(html))
+	})
+}
+
+func TestReadResponse(t *testing.T) {
+	http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := store.ParseTradeResponse(r)
+		fmt.Println(resp, err)
+	})
 }
