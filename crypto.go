@@ -17,7 +17,7 @@ var (
 func KeyEncrypt(plaintext, hashKey, hashIV string) (string, string) {
 	bKey := []byte(hashKey)
 	bIV := []byte(hashIV)
-	bPlaintext := AddPKCS7Padding([]byte(plaintext))
+	bPlaintext := PKCS7Padding([]byte(plaintext))
 	block, _ := aes.NewCipher(bKey)
 	ciphertext := make([]byte, len(bPlaintext))
 	mode := cipher.NewCBCEncrypter(block, bIV)
@@ -32,10 +32,16 @@ func KeyEncrypt(plaintext, hashKey, hashIV string) (string, string) {
 	return hexCipherText, code256
 }
 
-func AddPKCS7Padding(ciphertext []byte) []byte {
+func PKCS7Padding(ciphertext []byte) []byte {
 	padding := blockSize - (len(ciphertext) % blockSize)
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(ciphertext, padtext...)
+}
+
+func PKCS7UnPadding(origData []byte) []byte {
+	length := len(origData)
+	unpadding := int(origData[length-1])
+	return origData[:(length - unpadding)]
 }
 
 func KeyDecrypt(deCodeText, hashKey, hashIV string) (string, error) {
@@ -49,7 +55,7 @@ func KeyDecrypt(deCodeText, hashKey, hashIV string) (string, error) {
 	}
 	mode := cipher.NewCBCDecrypter(block, []byte(hashIV))
 	mode.CryptBlocks(cipherTextDecoded, cipherTextDecoded)
-	return string(cipherTextDecoded), nil
+	return string(PKCS7UnPadding(cipherTextDecoded)), nil
 }
 
 func GenerateCheckValue(plaintext, hashKey, hashIV string) string {
