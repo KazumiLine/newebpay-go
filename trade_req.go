@@ -269,5 +269,9 @@ func (trade *TradeRequest) GenerateHTML() (string, error) {
 		"Version":     "2.0",
 		"EncryptType": "0",
 	}
-	return GenerateAutoSubmitHtmlForm(trade.ApiUrl, params)
+	var apiUrl = TradeReqUrl
+	if trade.SimulationMode {
+		apiUrl = TestTradeReqUrl
+	}
+	return GenerateAutoSubmitHtmlForm(apiUrl, params)
 }

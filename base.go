@@ -1,7 +1,9 @@
 package newebpay
 
-const TestApiUrl string = "https://ccore.newebpay.com/MPG/mpg_gateway"
-const ApiUrl string = "https://core.newebpay.com/MPG/mpg_gateway"
+const TestTradeReqUrl string = "https://ccore.newebpay.com/MPG/mpg_gateway"
+const TradeReqUrl string = "https://core.newebpay.com/MPG/mpg_gateway"
+const TestTradeInfoUrl string = "https://ccore.newebpay.com/API/QueryTradeInfo"
+const TradeInfoUrl string = "https://core.newebpay.com/API/QueryTradeInfo"
 
 type LangType string
 
@@ -51,3 +53,29 @@ const (
 	LgsType_B2C LgsType = "B2C"
 	LgsType_C2C LgsType = "C2C"
 )
+
+type TradeStatus string
+
+const (
+	TradeStatus_UNPAID    = "0"
+	TradeStatus_PAID      = "1"
+	TradeStatus_FAILED    = "2"
+	TradeStatus_CANCELLED = "3"
+)
+
+func (p *TradeStatus) UnmarshalText(data []byte) error {
+	switch string(data) {
+	case "0":
+		*p = "UNPAID"
+	case "1":
+		*p = "PAID"
+	case "2":
+		*p = "FAILED"
+	case "3":
+		*p = "CANCELLED"
+
+	default:
+		*p = "Unrecognized"
+	}
+	return nil
+}

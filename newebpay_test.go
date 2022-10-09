@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var store = NewStore("StoreID", "Key", "IV", TestApiUrl)
+var store = NewStore("StoreID", "Key", "IV", true)
 
 func TestNewTrade(t *testing.T) {
 	http.HandleFunc("/new", func(w http.ResponseWriter, r *http.Request) {
